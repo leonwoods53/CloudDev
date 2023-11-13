@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request  # from module import Class.
+from flask import Flask, render_template, request # from module import Class.
 
 
 import os 
@@ -9,11 +9,15 @@ import swim_utils
 
 app = Flask(__name__)
 
+FOLDER = "swimdata"
 
 @app.get("/")
 @app.get("/hello")
 def hello():
-    return "Hello from my first web app - cool, isn't it?"  # ANY string.
+    return render_template(
+                "select.html",
+                title= "Swimmer Events"
+    )
 
 
 @app.get("/chart")
@@ -56,8 +60,9 @@ def get_swimmers_names():
     )
 
 
-@app.post("/displayevents")
+@app.post("/displayevents", methods=["POST"])
 def get_swimmer_events():
+    selected_swimmer = request.form["swimmer"]
     return request.form["swimmer"]
 
 
