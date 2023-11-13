@@ -6,7 +6,6 @@ import swim_utils
 
 
 app = Flask(__name__)
-app.secret_key = "session"
 
 
 @app.get("/")
@@ -53,17 +52,31 @@ def get_swimmers_names():
 def display_swimmers():
     names = get_swimmers_names()
     return render_template (
-        "select.html",
+        "select_name.html",
         title="Select a swimmer to chart",
         url="/displayevents",
         select_id="swimmer",
         data=names,
     )
 
-@app.post("/displayevents")
 def get_swimmer_events():
-    return request.form["swimmer"]
+    files = os.listdir(swim_utils.FOLDER)
+    files.remove(".DS_Store")
+    unique_events = set()
+    for event in files:
+        unique_events.add(swim_utils.get_swimmers_data(event)[0])
+    return sorted(list(unique_events))
 
+@app.post("/displayevents")
+def display_events():
+    events = get_swimmer_events()
+    return render_template (
+        "select_event.html",
+        title="Select an event to chart",
+        url="/chart",
+        select_event="event",
+        data=events,
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

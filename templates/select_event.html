@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <form method="POST" action="{{ url }}">
+        <label for="{{ select_event }}">Choose an event:</label>
+
+        <select name="{{ select_event }}" id="{{ select_event }}">
+
+            {% for event in data %}
+
+                <option value="{{ stroke }}">{{ stroke }}</option>
+            
+            {% endfor %}
+
+        </select>
+        <p>
+            <input type="submit" value="Create Chart">
+        </p>
+    </form>
+
+{% endblock %}
