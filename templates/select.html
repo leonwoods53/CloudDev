@@ -1,16 +1,15 @@
 {% extends "base.html" %}
 
-
 {% block body %}
 
-    <form method="POST" action="/displayevents">
-        <label for="swimmer">Choose a swimmer:</label>
+    <form method="POST" action="{{ url }}">
+        <label for="{{ select_id }}">Choose a swimmer:</label>
 
-        <select name="swimmer" id="swimmer">
+        <select name="{{ select_id }}" id="{{ select_id }}">
 
             {% for name in data %}
 
-                <option value="{{name}}">{{ name }}</option>
+                <option value="{{ name }}">{{ name }}</option>
             
             {% endfor %}
 

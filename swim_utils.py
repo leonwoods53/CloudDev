@@ -1,74 +1,49 @@
-import os
 from statistics import mean
 
+
+import hfpy_utils
+
+
 FOLDER = "swimdata/"
-path = "/Users/Leon/Year3SETU/CloudDev/swimdata"
 
-# function 1
+
 def convert2hundreths(timestring):
-    mins, rest = timestring.split(":")
-    secs, hundreths = rest.split(".")
-    return int(hundreths) + (int(secs) * 100) + ((int(mins) * 60) * 100)
+    """Given a string which represents a time, this function converts the string
+    to a number (int) representing the string's hundredths of seconds value, which is
+    returned.
+    """
+    if ":" in timestring:
+        mins, rest = timestring.split(":")
+        secs, hundredths = rest.split(".")
+    else:
+        mins = 0
+        secs, hundredths = timestring.split(".")
 
-# function 2
+    return int(hundredths) + (int(secs) * 100) + ((int(mins) * 60) * 100)
+
+
 def build_time_string(num_time):
-    secs, hundredths = f"{num_time/100:.2f}".split(".")
+    """ """
+    secs, hundredths = str(round(num_time / 100, 2)).split(".")
     mins = int(secs) // 60
-    seconds = int(secs) - mins*60
+    seconds = int(secs) - mins * 60
     return f"{mins}:{seconds}.{hundredths}"
 
-# function 3
+
 def get_swimmers_data(filename):
+    """ """
     name, age, distance, stroke = filename.removesuffix(".txt").split("-")
-    with open(FOLDER + filename) as fn:
-        data = fn.read()
+    with open(FOLDER + filename) as fh:
+        data = fh.read()
     times = data.strip().split(",")
-    converts = []
+    converts = []  # empty list
     for t in times:
         converts.append(convert2hundreths(t))
     average = build_time_string(mean(converts))
 
     return name, age, distance, stroke, times, converts, average
 
-# function 4
-def get_swimmers_names(): 
-    swim_list = []
-    dir_list = os.listdir(path)
-    for file in dir_list:
-        if file.endswith(".txt"):
-           swim_list.append(file)
 
-    names = [filename.removesuffix(".txt").split("-")[0] for filename in swim_list]
-    unique_names = list(set(names))
-    sorted_names = sorted(unique_names)
-
-    return sorted_names
-
-# function 5
-def get_swimmers_list():
-    swim_list = []
-    dir_list = os.listdir(path)
-    for file in dir_list:
-        if file.endswith(".txt"):
-            swim_list.append(file)
-           
-    return swim_list
-
-# function 6
-def get_events(name: str, files: list) -> list:
-    swims = []
-    for file in files:
-        if file.startswith(name+'-'):
-            names, age, distance, stroke = file.removesuffix(".txt").split("-")
-            race = f"{distance} {stroke}"
-            swims.append((race, file))
-
-    return swims
-
-
-    return name, age, distance, stroke, times, converts, average
-
-# function 7
 def produce_bar_chart(fn):
     """Given the name of a swimmer's file, produce a HTML/SVG-based bar chart.
 

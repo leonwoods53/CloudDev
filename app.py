@@ -1,6 +1,4 @@
-from flask import Flask, render_template, request # from module import Class.
-
-
+from flask import Flask, render_template, request, session # from module import Class.
 import os 
 
 import hfpy_utils
@@ -8,17 +6,15 @@ import swim_utils
 
 
 app = Flask(__name__)
+app.secret_key = "session"
 
-FOLDER = "swimdata"
 
 @app.get("/")
 @app.get("/hello")
 def hello():
     return render_template(
-                "select.html",
-                title= "Swimmer Events"
+        "base.html"
     )
-
 
 @app.get("/chart")
 def display_chart():
@@ -30,7 +26,7 @@ def display_chart():
         the_times,
         converts,
         the_average,
-    ) = swim_utils.get_swimmers_data("Darius-13-100m-Fly.txt")
+    ) = swim_utils.get_swimmers_data("Abi-10-100m-Breast.txt")
 
     the_title = f"{name} (Under {age}) {distance} {stroke}"
     from_max = max(converts) + 50
@@ -45,26 +41,29 @@ def display_chart():
         data=the_data,
     )
 
-
-@app.get("/getswimmers")
 def get_swimmers_names():
     files = os.listdir(swim_utils.FOLDER)
     files.remove(".DS_Store")
-    names = set()
+    unique_names = set()
     for swimmer in files:
-        names.add(swim_utils.get_swimmers_data(swimmer)[0])
-    return render_template(
+        unique_names.add(swim_utils.get_swimmers_data(swimmer)[0])
+    return sorted(list(unique_names))
+
+@app.get("/swimmers")
+def display_swimmers():
+    names = get_swimmers_names()
+    return render_template (
         "select.html",
         title="Select a swimmer to chart",
-        data=sorted(names),
+        url="/displayevents",
+        select_id="swimmer",
+        data=names,
     )
 
-
-@app.post("/displayevents", methods=["POST"])
+@app.post("/displayevents")
 def get_swimmer_events():
-    selected_swimmer = request.form["swimmer"]
     return request.form["swimmer"]
 
 
 if __name__ == "__main__":
-    app.run(debug=True)  # Starts a local (test) webserver, and waits... forever.
+    app.run(debug=True)
