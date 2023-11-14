@@ -3,9 +3,9 @@
 {% block body %}
 
     <form method="POST" action="{{ url }}">
-        <label for="{{ select_id }}">Choose a swimmer:</label>
+        <label for="{{ selected_swimmer }}">Choose a swimmer:</label>
 
-        <select name="{{ select_id }}" id="{{ select_id }}">
+        <select name="{{ selected_swimmer }}" id="{{ selected_swimmer }}">
 
             {% for name in data %}
 

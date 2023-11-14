@@ -55,27 +55,36 @@ def display_swimmers():
         "select_name.html",
         title="Select a swimmer to chart",
         url="/displayevents",
-        select_id="swimmer",
+        selected_swimmer="swimmer",
         data=names,
     )
 
-def get_swimmer_events():
+def get_swimmer_events(selected_swimmer):
     files = os.listdir(swim_utils.FOLDER)
     files.remove(".DS_Store")
-    unique_events = set()
-    for event in files:
-        unique_events.add(swim_utils.get_swimmers_data(event)[0])
-    return sorted(list(unique_events))
+    swims = []
+    for file in files:
+        if selected_swimmer and file.startswith(selected_swimmer + '-'):
+            swimmer_data = swim_utils.get_swimmers_data(file)
+            if swimmer_data:
+                distance,stroke = swimmer_data[2],swimmer_data[3]
+                race = f"{distance} {stroke}"
+                swims.append((race))
+    return swims
+
 
 @app.post("/displayevents")
 def display_events():
-    events = get_swimmer_events()
+    selected_swimmer = request.form.get("swimmer")
+    events = get_swimmer_events(selected_swimmer)
+
     return render_template (
         "select_event.html",
         title="Select an event to chart",
         url="/chart",
         select_event="event",
         data=events,
+        selected_swimmer=selected_swimmer, 
     )
 
 if __name__ == "__main__":
