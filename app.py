@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session # from module import Class.
+from flask import Flask, render_template, request, redirect, url_for # from module import Class.
 import os 
 
 import hfpy_utils
@@ -7,38 +7,9 @@ import swim_utils
 
 app = Flask(__name__)
 
-
 @app.get("/")
-@app.get("/hello")
-def hello():
-    return render_template(
-        "base.html"
-    )
-
-@app.get("/chart")
-def display_chart():
-    (
-        name,
-        age,
-        distance,
-        stroke,
-        the_times,
-        converts,
-        the_average,
-    ) = swim_utils.get_swimmers_data("Abi-10-100m-Breast.txt")
-
-    the_title = f"{name} (Under {age}) {distance} {stroke}"
-    from_max = max(converts) + 50
-    the_converts = [ hfpy_utils.convert2range(n, 0, from_max, 0, 350) for n in converts ]
-
-    the_data = zip(the_converts, the_times)
-
-    return render_template(
-        "chart.html",
-        title=the_title,
-        average=the_average,
-        data=the_data,
-    )
+def index():
+    return redirect(url_for("display_swimmers"))
 
 def get_swimmers_names():
     files = os.listdir(swim_utils.FOLDER)
@@ -74,7 +45,7 @@ def get_swimmer_events(selected_swimmer):
 
 
 @app.post("/displayevents")
-def display_events():
+def display_events(): 
     selected_swimmer = request.form.get("swimmer")
     events = get_swimmer_events(selected_swimmer)
 
@@ -85,6 +56,30 @@ def display_events():
         select_event="event",
         data=events,
         selected_swimmer=selected_swimmer, 
+    )
+
+@app.post("/chart")
+def display_chart():
+    selected_swimmer = request.form.get("selected_swimmer")
+    selected_event = request.form.get("select_event")
+
+    distance, stroke = selected_event.replace(' ','-')
+   
+    filename = f"{selected_swimmer}-age-{selected_event}.txt"
+    swimmer_data = swim_utils.get_swimmers_data(filename)
+        
+    name,age,distance,stroke,the_times,converts,the_average = swimmer_data
+
+    the_title = f"{name} (Under {age}) {distance} {stroke}"
+    from_max = max(converts) + 50
+    the_converts = [ hfpy_utils.convert2range(n, 0, from_max, 0, 350) for n in converts ]
+    the_data = zip(the_converts, the_times)
+
+    return render_template(
+        "chart.html",
+        title=the_title,
+        average=the_average,
+        data=the_data,
     )
 
 if __name__ == "__main__":
